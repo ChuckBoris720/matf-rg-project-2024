@@ -1,6 +1,9 @@
 {
   "resources": {
     "models": {
+      "pyramid": {
+        "path": "pyramid/pyramid.obj"
+      }
     }
   },
   "window": {

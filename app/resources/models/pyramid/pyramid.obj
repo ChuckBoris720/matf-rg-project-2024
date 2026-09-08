@@ -1,0 +1,24 @@
+# Square-based pyramid: 4 vertices form the square base,
+# while the 5th is the apex centered aboce the base.
+# Coordinates:
+# 1 - front-left
+# 2 - front right
+# 3 - back right
+# 4 - back-left
+# 5 - apex
+
+v -1.0 0.0 -1.0
+v 1.0 0.0 -1.0
+v 1.0 0.0 1.0
+v -1.0 0.0 1.0
+v 0.0 1.5 0.0
+
+# Faces:
+# 4 triangular side faces connect the base vertices to the apex
+# 1 quadrilateral face forms the square base.
+
+f 1 2 5
+f 2 3 5
+f 3 4 5
+f 4 1 5
+f 1 4 3 2
