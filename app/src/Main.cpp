@@ -1,5 +1,6 @@
 #include <engine/core/Engine.hpp>
 #include <engine/resources/ResourcesController.hpp>
+#include <engine/graphics/GraphicsController.hpp>
 #include <spdlog/spdlog.h>
 
 class SceneController : public engine::core::Controller {
@@ -16,8 +17,23 @@ void SceneController::begin_draw() { engine::graphics::OpenGL::clear_buffers(); 
 
 void SceneController::draw() {
     auto *resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto *graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+
     auto pyramid = resources->model("pyramid");
     auto shader = resources->shader("basic");
+
+    auto camera = graphics->camera();
+    camera->Position = glm::vec3(3.0f, 2.0f, 5.0f);
+
+    auto view = camera->view_matrix();
+    auto projection = graphics->projection_matrix();
+
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+
+    shader->use();
+    shader->set_mat4("model", model);
+    shader->set_mat4("view", view);
+    shader->set_mat4("projection", projection);
 
     pyramid->draw(shader);
 }
