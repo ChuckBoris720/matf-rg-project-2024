@@ -63,32 +63,101 @@ void SceneController::draw() {
     auto view = camera->view_matrix();
     auto projection = graphics->projection_matrix();
 
-    auto draw_model = [&](engine::resources::Model *model, const glm::mat4 &model_matrix) {
+    auto draw_model = [&](engine::resources::Model *model, const glm::mat4 &model_matrix, const glm::vec3 &object_color) {
         shader->use();
         shader->set_mat4("model", model_matrix);
         shader->set_mat4("view", view);
         shader->set_mat4("projection", projection);
 
+        shader->set_vec3("objectColor", object_color);
+        shader->set_vec3("lightDirection", glm::vec3(-0.5f, -1.0f, -0.3f));
+        shader->set_vec3("lightColor", glm::vec3(1.0f, 0.9f, 0.7f));
+
         model->draw(shader);
     };
 
-    draw_model(ground, glm::mat4(1.0f));
+    draw_model(
+            ground,
+            glm::mat4(1.0f),
+            glm::vec3(0.55f, 0.35f, 0.15f)
+            );
 
-    draw_model(pyramid, glm::translate(
-                       glm::mat4(1.0f),
-                       glm::vec3(0.0f, 0.0f, -5.0f)
-                       ));
+    draw_model(
+            pyramid,
+            glm::scale(
+                    glm::translate(
+                            glm::mat4(1.0f),
+                            glm::vec3(0.0f, 0.0f, -6.0f)
+                            ),
+                    glm::vec3(1.5f)
+                    ),
+            glm::vec3(0.8f, 0.55f, 0.25f)
+            );
 
-    draw_model(cactus, glm::translate(
-                       glm::mat4(1.0f),
-                       glm::vec3(-4.0f, 0.0f, -7.0f)
-                       ));
+    // Kaktus 1
+    draw_model(
+            cactus,
+            glm::scale(
+                    glm::translate(
+                            glm::mat4(1.0f),
+                            glm::vec3(-3.5f, 1.0f, -6.5f)
+                            ),
+                    glm::vec3(0.8f)
+                    ),
+            glm::vec3(0.15f, 0.45f, 0.12f)
+            );
 
-    draw_model(palm, glm::translate(
-                       glm::mat4(1.0f),
-                       glm::vec3(4.0f, 0.0f, -9.0f)
-                       ));
+    // Kaktus 2
+    draw_model(
+            cactus,
+            glm::scale(
+                    glm::translate(
+                            glm::mat4(1.0f),
+                            glm::vec3(3.0f, 0.8f, -7.0f)
+                            ),
+                    glm::vec3(0.65f)
+                    ),
+            glm::vec3(0.15f, 0.45f, 0.12f)
+            );
 
+    // Kaktus 3
+    draw_model(
+            cactus,
+            glm::scale(
+                    glm::translate(
+                            glm::mat4(1.0f),
+                            glm::vec3(-5.0f, 1.1f, -10.0f)
+                            ),
+                    glm::vec3(0.9f)
+                    ),
+            glm::vec3(0.15f, 0.45f, 0.12f)
+            );
+
+    // Palma 1
+    draw_model(
+            palm,
+            glm::scale(
+                    glm::translate(
+                            glm::mat4(1.0f),
+                            glm::vec3(4.0f, 0.0f, -9.0f)
+                            ),
+                    glm::vec3(0.02f)
+                    ),
+            glm::vec3(0.25f, 0.45f, 0.12f)
+            );
+
+    // Palma 2
+    draw_model(
+            palm,
+            glm::scale(
+                    glm::translate(
+                            glm::mat4(1.0f),
+                            glm::vec3(6.0f, 0.0f, -12.0f)
+                            ),
+                    glm::vec3(0.03f)
+                    ),
+            glm::vec3(0.25f, 0.45f, 0.12f)
+            );
     graphics->draw_skybox(skybox_shader, skybox);
 }
 
