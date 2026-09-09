@@ -3,6 +3,15 @@
     "models": {
       "pyramid": {
         "path": "pyramid/pyramid.obj"
+      },
+      "cactus": {
+        "path": "cactus/model.obj"
+      },
+      "palm": {
+        "path": "palm/palm_tree_02.obj"
+      },
+      "ground": {
+        "path": "ground/ground.obj"
       }
     }
   },

@@ -51,21 +51,45 @@ void SceneController::draw() {
     auto *graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
 
     auto pyramid = resources->model("pyramid");
+    auto cactus = resources->model("cactus");
+    auto palm = resources->model("palm");
+    auto ground = resources->model("ground");
+
     auto shader = resources->shader("basic");
+    auto skybox_shader = resources->shader("skybox");
+    auto skybox = resources->skybox("desert");
 
     auto camera = graphics->camera();
-
     auto view = camera->view_matrix();
     auto projection = graphics->projection_matrix();
 
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+    auto draw_model = [&](engine::resources::Model *model, const glm::mat4 &model_matrix) {
+        shader->use();
+        shader->set_mat4("model", model_matrix);
+        shader->set_mat4("view", view);
+        shader->set_mat4("projection", projection);
 
-    shader->use();
-    shader->set_mat4("model", model);
-    shader->set_mat4("view", view);
-    shader->set_mat4("projection", projection);
+        model->draw(shader);
+    };
 
-    pyramid->draw(shader);
+    draw_model(ground, glm::mat4(1.0f));
+
+    draw_model(pyramid, glm::translate(
+                       glm::mat4(1.0f),
+                       glm::vec3(0.0f, 0.0f, -5.0f)
+                       ));
+
+    draw_model(cactus, glm::translate(
+                       glm::mat4(1.0f),
+                       glm::vec3(-4.0f, 0.0f, -7.0f)
+                       ));
+
+    draw_model(palm, glm::translate(
+                       glm::mat4(1.0f),
+                       glm::vec3(4.0f, 0.0f, -9.0f)
+                       ));
+
+    graphics->draw_skybox(skybox_shader, skybox);
 }
 
 void SceneController::end_draw() { engine::core::Controller::get<engine::platform::PlatformController>()->swap_buffers(); }

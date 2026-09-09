@@ -1,0 +1,10 @@
+# Desert ground: large square plane centered at the origin.
+# The four vertices form the ground surface.
+# The face covers the whole square.
+
+v -25.0 0.0 -25.0
+v 25.0 0.0 -25.0
+v 25.0 0.0 25.0
+v -25.0 0.0 25.0
+
+f 1 2 3 4
