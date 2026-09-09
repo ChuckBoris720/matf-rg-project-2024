@@ -42,7 +42,6 @@ void SceneController::update() {
     auto mouse = platform->mouse();
 
     camera->rotate_camera(mouse.dx, mouse.dy);
-    camera->zoom(mouse.scroll);
 }
 
 void SceneController::begin_draw() { engine::graphics::OpenGL::clear_buffers(); }
