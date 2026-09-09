@@ -65,6 +65,7 @@ void SceneController::draw() {
 
     auto draw_model = [&](engine::resources::Model *model, const glm::mat4 &model_matrix, const glm::vec3 &object_color) {
         shader->use();
+
         shader->set_mat4("model", model_matrix);
         shader->set_mat4("view", view);
         shader->set_mat4("projection", projection);
@@ -72,6 +73,7 @@ void SceneController::draw() {
         shader->set_vec3("objectColor", object_color);
         shader->set_vec3("lightDirection", glm::vec3(-0.5f, -1.0f, -0.3f));
         shader->set_vec3("lightColor", glm::vec3(1.0f, 0.9f, 0.7f));
+        shader->set_vec3("viewPos", camera->Position);
 
         model->draw(shader);
     };
