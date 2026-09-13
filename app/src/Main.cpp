@@ -17,43 +17,63 @@ public:
 
     void end_draw() override;
 
+    void poll_events() override;
+
 private:
     glm::vec3 m_directional_direction{-0.5f, -1.0f, -0.3f};
     glm::vec3 m_directional_color{1.0f, 0.9f, 0.7f};
-    float m_directional_intenstity{1.0f};
+    float m_directional_intensity{1.0f};
 
     glm::vec3 m_point_light_position{1.0f, 2.5f, -5.0f};
     glm::vec3 m_point_light_color{2.5f, 0.9f, 0.2f};
     float m_point_light_intensity{2.5f};
 
     float m_ambient_intensity{0.3f};
+
+    bool m_cursor_enabled{true};
 };
 
 void SceneController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
 
     auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
+
     camera->Position = glm::vec3(0.0f, 2.0f, 5.0f);
+}
+
+void SceneController::poll_events() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+
+    if (platform->key(engine::platform::KEY_F1).state() == engine::platform::Key::State::JustPressed) {
+        m_cursor_enabled = !m_cursor_enabled;
+        platform->set_enable_cursor(m_cursor_enabled);
+    }
 }
 
 void SceneController::update() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+
     auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
+
+    if (m_cursor_enabled) return;
 
     float dt = platform->dt();
 
-    if (platform->key(engine::platform::KEY_W).is_down()) camera->move_camera(engine::graphics::Camera::Movement::FORWARD, dt);
+    if (platform->key(engine::platform::KEY_W).is_down())
+        camera->move_camera(
+                engine::graphics::Camera::Movement::FORWARD, dt);
 
-    if (platform->key(engine::platform::KEY_A).is_down()) camera->move_camera(engine::graphics::Camera::Movement::LEFT, dt);
+    if (platform->key(engine::platform::KEY_A).is_down())
+        camera->move_camera(
+                engine::graphics::Camera::Movement::LEFT, dt);
 
-    if (platform->key(engine::platform::KEY_S).is_down()) camera->move_camera(engine::graphics::Camera::Movement::BACKWARD, dt);
+    if (platform->key(engine::platform::KEY_S).is_down())
+        camera->move_camera(
+                engine::graphics::Camera::Movement::BACKWARD, dt);
 
-    if (platform->key(engine::platform::KEY_D).is_down()) camera->move_camera(engine::graphics::Camera::Movement::RIGHT, dt);
-
-
-    auto mouse = platform->mouse();
-
-    camera->rotate_camera(mouse.dx, mouse.dy);
+    if (platform->key(engine::platform::KEY_D).is_down())
+        camera->move_camera(
+                engine::graphics::Camera::Movement::RIGHT, dt);
 }
 
 void SceneController::begin_draw() { engine::graphics::OpenGL::clear_buffers(); }
@@ -85,7 +105,7 @@ void SceneController::draw() {
         shader->set_vec3("objectColor", object_color);
         shader->set_vec3("lightDirection", m_directional_direction);
         shader->set_vec3("lightColor", m_directional_color);
-        shader->set_float("directionalIntensity", m_directional_intenstity);
+        shader->set_float("directionalIntensity", m_directional_intensity);
 
         shader->set_vec3("pointLightPosition", m_point_light_position);
         shader->set_vec3("pointLightColor", m_point_light_color);
@@ -204,7 +224,7 @@ void SceneController::draw() {
 
     ImGui::SliderFloat(
             "Directional intensity",
-            &m_directional_intenstity,
+            &m_directional_intensity,
             0.0f,
             3.0f
             );
