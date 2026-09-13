@@ -30,6 +30,8 @@ private:
 
     float m_ambient_intensity{0.3f};
 
+    glm::vec3 m_skybox_tint{1.0f, 1.0f, 1.0f};
+
     enum class EventState {
         Idle,
         WaitingForSunset,
@@ -89,6 +91,8 @@ void SceneController::update() {
             m_directional_intensity = 0.5f;
             m_directional_color = glm::vec3(1.0f, 0.45f, 0.15f);
 
+            m_skybox_tint = glm::vec3(1.0f, 0.55f, 0.35f);
+
             m_event_state = EventState::WaitingForNight;
             m_event_timer = 0.0f;
         }
@@ -96,6 +100,8 @@ void SceneController::update() {
         else if (m_event_state == EventState::WaitingForNight && m_event_timer >= 5.0f) {
             m_point_light_intensity = 4.0f;
             m_point_light_color = glm::vec3(1.0f, 0.2f, 0.05f);
+
+            m_skybox_tint = glm::vec3(0.18f, 0.22f, 0.4f);
 
             m_event_state = EventState::Idle;
             m_event_timer = 0.0f;
@@ -228,6 +234,10 @@ void SceneController::draw() {
                     ),
             glm::vec3(0.25f, 0.45f, 0.12f)
             );
+
+    skybox_shader->use();
+    skybox_shader->set_vec3("skyboxTint", m_skybox_tint);
+
     graphics->draw_skybox(skybox_shader, skybox);
 
 
