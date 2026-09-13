@@ -29,11 +29,16 @@ out vec4 FragColor;
 
 uniform vec3 viewPos;
 uniform vec3 objectColor;
+
 uniform vec3 lightDirection;
 uniform vec3 lightColor;
 
 uniform vec3 pointLightPosition;
 uniform vec3 pointLightColor;
+
+uniform float directionalIntensity;
+uniform float pointLightIntensity;
+uniform float ambientIntensity;
 
 void main() {
     vec3 normal = normalize(Normal);
@@ -48,7 +53,7 @@ void main() {
 
     float directionalSpecular = pow(max(dot(viewDir, directionalReflectDir), 0.0), 32.0);
 
-    vec3 directionalLighting = (directionalDiffuse * objectColor + 0.5 * directionalSpecular) * lightColor;
+    vec3 directionalLighting = (directionalDiffuse * objectColor + 0.5 * directionalSpecular) * lightColor * directionalIntensity;
 
     // tackasto svetlo
     vec3 pointLightDir = normalize(pointLightPosition - FragPos);
@@ -63,10 +68,10 @@ void main() {
 
     float pointSpecular = pow(max(dot(viewDir, pointReflectDir), 0.0), 32.0);
 
-    vec3 pointLighting = attenuation * pointLightColor * (pointDiffuse * objectColor + 0.5 * pointSpecular);
+    vec3 pointLighting = (pointDiffuse * objectColor + 0.5 * pointSpecular) * attenuation * pointLightColor * pointLightIntensity;
 
     // ambijentalno svetlo
-    vec3 ambient = 0.3 * objectColor;
+    vec3 ambient = objectColor * ambientIntensity;
 
     // celokupno svetlo
     vec3 lighting = ambient + directionalLighting + pointLighting;
