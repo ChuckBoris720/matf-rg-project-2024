@@ -30,7 +30,14 @@ private:
 
     float m_ambient_intensity{0.3f};
 
-    bool m_cursor_enabled{true};
+    enum class EventState {
+        Idle,
+        WaitingForSunset,
+        WaitingForNight
+    };
+
+    EventState m_event_state{EventState::Idle};
+    float m_event_timer{0.0f};
 };
 
 void SceneController::initialize() {
@@ -44,9 +51,9 @@ void SceneController::initialize() {
 void SceneController::poll_events() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
 
-    if (platform->key(engine::platform::KEY_F1).state() == engine::platform::Key::State::JustPressed) {
-        m_cursor_enabled = !m_cursor_enabled;
-        platform->set_enable_cursor(m_cursor_enabled);
+    if (platform->key(engine::platform::KEY_F2).state() == engine::platform::Key::State::JustPressed && m_event_state == EventState::Idle) {
+        m_event_state = EventState::WaitingForSunset;
+        m_event_timer = 0.0f;
     }
 }
 
@@ -55,7 +62,6 @@ void SceneController::update() {
 
     auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
 
-    if (m_cursor_enabled) return;
 
     float dt = platform->dt();
 
@@ -74,6 +80,28 @@ void SceneController::update() {
     if (platform->key(engine::platform::KEY_D).is_down())
         camera->move_camera(
                 engine::graphics::Camera::Movement::RIGHT, dt);
+
+    if (m_event_state != EventState::Idle) {
+        m_event_timer += dt;
+
+        // dogadjaj 1 - zalazak sunca
+        if (m_event_state == EventState::WaitingForSunset && m_event_timer >= 3.0f) {
+            m_directional_intensity = 0.5f;
+            m_directional_color = glm::vec3(1.0f, 0.45f, 0.15f);
+
+            m_event_state = EventState::WaitingForNight;
+            m_event_timer = 0.0f;
+        }
+        // dogadjaj 2 - noc
+        else if (m_event_state == EventState::WaitingForNight && m_event_timer >= 5.0f) {
+            m_point_light_intensity = 4.0f;
+            m_point_light_color = glm::vec3(1.0f, 0.2f, 0.05f);
+
+            m_event_state = EventState::Idle;
+            m_event_timer = 0.0f;
+        }
+    }
+
 }
 
 void SceneController::begin_draw() { engine::graphics::OpenGL::clear_buffers(); }
