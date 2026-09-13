@@ -75,6 +75,9 @@ void SceneController::draw() {
         shader->set_vec3("lightColor", glm::vec3(1.0f, 0.9f, 0.7f));
         shader->set_vec3("viewPos", camera->Position);
 
+        shader->set_vec3("pointLightPosition", glm::vec3(1.0f, 2.5f, -5.0f));
+        shader->set_vec3("pointLightColor", glm::vec3(2.5f, 0.9f, 0.2f));
+
         model->draw(shader);
     };
 
