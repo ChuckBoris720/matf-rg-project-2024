@@ -5,11 +5,12 @@ Projekat predstavlja jednostavnu scenu pustinje sa piramidom, kaktusima, palmama
 
 ## Controls
 
+F1 -> promena moda kamere (pomeraj/rotacija)
 F2 -> pokretanje sekvence zalaska sunca i noci
-W -> kretanje napred
-A -> kretanje levo
-S -> kretanje nazad
-D -> kretanje desno
+W -> kretanje napred/rotacija nagore
+A -> kretanje levo/rotacija ulevo
+S -> kretanje nazad/rotacija nadole
+D -> kretanje desno/rotacija udesno
 
 ## Features
 
@@ -40,7 +41,7 @@ D -> kretanje desno
 
 - Cactus: https://poly.pizza/m/2Kng1KnfMEc
 - Palm tree: https://poly.pizza/m/bjGeBbKhAVN
-- Pyramid: sopstveni model
+- Pyramid: https://poly.pizza/m/7Df4CP5wicB
 - Ground: sopstveni model
   Piramida i ground modelovani su za potrebe projekta.
 
