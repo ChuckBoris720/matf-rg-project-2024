@@ -146,6 +146,8 @@ void SceneController::draw() {
     auto draw_model = [&](engine::resources::Model *model, const glm::mat4 &model_matrix, const glm::vec3 &object_color) {
         shader->use();
 
+        shader->set_bool("useTexture", model == pyramid);
+
         shader->set_mat4("model", model_matrix);
         shader->set_mat4("view", view);
         shader->set_mat4("projection", projection);
@@ -169,7 +171,7 @@ void SceneController::draw() {
     draw_model(
             ground,
             glm::mat4(1.0f),
-            glm::vec3(0.55f, 0.35f, 0.15f)
+            glm::vec3(0.55f, 0.0f, 0.15f)
             );
 
     draw_model(
@@ -179,7 +181,7 @@ void SceneController::draw() {
                             glm::mat4(1.0f),
                             glm::vec3(0.0f, 0.0f, -6.0f)
                             ),
-                    glm::vec3(1.0f)
+                    glm::vec3(0.5f)
                     ),
             glm::vec3(0.8f, 0.55f, 0.25f)
             );
@@ -190,7 +192,7 @@ void SceneController::draw() {
             glm::scale(
                     glm::translate(
                             glm::mat4(1.0f),
-                            glm::vec3(-3.5f, 1.0f, -6.5f)
+                            glm::vec3(-3.5f, 0.24f, -6.5f)
                             ),
                     glm::vec3(0.8f)
                     ),
@@ -203,7 +205,7 @@ void SceneController::draw() {
             glm::scale(
                     glm::translate(
                             glm::mat4(1.0f),
-                            glm::vec3(3.0f, 0.8f, -7.0f)
+                            glm::vec3(3.0f, 0.18f, -7.0f)
                             ),
                     glm::vec3(0.65f)
                     ),
@@ -216,7 +218,7 @@ void SceneController::draw() {
             glm::scale(
                     glm::translate(
                             glm::mat4(1.0f),
-                            glm::vec3(-5.0f, 1.1f, -10.0f)
+                            glm::vec3(-5.0f, 0.24f, -10.0f)
                             ),
                     glm::vec3(0.9f)
                     ),
