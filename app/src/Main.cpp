@@ -32,6 +32,8 @@ private:
 
     glm::vec3 m_skybox_tint{1.0f, 1.0f, 1.0f};
 
+    bool m_rotation_mode{false};
+
     enum class EventState {
         Idle,
         WaitingForSunset,
@@ -53,6 +55,8 @@ void SceneController::initialize() {
 void SceneController::poll_events() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
 
+    if (platform->key(engine::platform::KEY_F1).state() == engine::platform::Key::State::JustPressed) { m_rotation_mode = !m_rotation_mode; }
+
     if (platform->key(engine::platform::KEY_F2).state() == engine::platform::Key::State::JustPressed && m_event_state == EventState::Idle) {
         m_event_state = EventState::WaitingForSunset;
         m_event_timer = 0.0f;
@@ -67,21 +71,31 @@ void SceneController::update() {
 
     float dt = platform->dt();
 
-    if (platform->key(engine::platform::KEY_W).is_down())
-        camera->move_camera(
-                engine::graphics::Camera::Movement::FORWARD, dt);
+    if (!m_rotation_mode) {
+        if (platform->key(engine::platform::KEY_W).is_down()) camera->move_camera(engine::graphics::Camera::Movement::FORWARD, dt);
 
-    if (platform->key(engine::platform::KEY_A).is_down())
-        camera->move_camera(
-                engine::graphics::Camera::Movement::LEFT, dt);
+        if (platform->key(engine::platform::KEY_A).is_down()) camera->move_camera(engine::graphics::Camera::Movement::LEFT, dt);
 
-    if (platform->key(engine::platform::KEY_S).is_down())
-        camera->move_camera(
-                engine::graphics::Camera::Movement::BACKWARD, dt);
+        if (platform->key(engine::platform::KEY_S).is_down()) camera->move_camera(engine::graphics::Camera::Movement::BACKWARD, dt);
 
-    if (platform->key(engine::platform::KEY_D).is_down())
-        camera->move_camera(
-                engine::graphics::Camera::Movement::RIGHT, dt);
+        if (platform->key(engine::platform::KEY_D).is_down()) camera->move_camera(engine::graphics::Camera::Movement::RIGHT, dt);
+    } else {
+        const float rotation_speed = 60.0f;
+
+        if (platform->key(engine::platform::KEY_A).is_down()) camera->rotate_camera(-rotation_speed * dt, 0.0f);
+
+        if (platform->key(engine::platform::KEY_D).is_down()) camera->rotate_camera(rotation_speed * dt, 0.0f);
+
+        if (platform->key(engine::platform::KEY_W).is_down()) camera->rotate_camera(0.0f, rotation_speed * dt);
+
+        if (platform->key(engine::platform::KEY_S).is_down()) camera->rotate_camera(0.0f, -rotation_speed * dt);
+    }
+
+    const float vertical_speed = camera->MovementSpeed * dt;
+
+    if (platform->key(engine::platform::KEY_Q).is_down()) camera->Position.y += vertical_speed;
+
+    if (platform->key(engine::platform::KEY_E).is_down()) camera->Position.y -= vertical_speed;
 
     if (m_event_state != EventState::Idle) {
         m_event_timer += dt;
@@ -165,7 +179,7 @@ void SceneController::draw() {
                             glm::mat4(1.0f),
                             glm::vec3(0.0f, 0.0f, -6.0f)
                             ),
-                    glm::vec3(1.5f)
+                    glm::vec3(1.0f)
                     ),
             glm::vec3(0.8f, 0.55f, 0.25f)
             );
