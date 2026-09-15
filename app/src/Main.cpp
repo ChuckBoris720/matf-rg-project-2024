@@ -2,90 +2,9 @@
 #include <engine/resources/ResourcesController.hpp>
 #include <engine/graphics/GraphicsController.hpp>
 #include <spdlog/spdlog.h>
-#include <imgui.h>
 
-class LightingController : public engine::core::Controller {
-public:
-    glm::vec3 m_directional_direction{-0.5f, -1.0f, -0.3f};
-    glm::vec3 m_directional_color{1.0f, 0.9f, 0.7f};
-    float m_directional_intensity{1.0f};
-
-    glm::vec3 m_point_light_position{1.0f, 2.5f, -5.0f};
-    glm::vec3 m_point_light_color{2.5f, 0.9f, 0.2f};
-    float m_point_light_intensity{2.5f};
-
-    float m_ambient_intensity{0.3f};
-
-    glm::vec3 m_skybox_tint{1.0f, 1.0f, 1.0f};
-
-    void draw() override;
-};
-
-void LightingController::draw() {
-    auto *graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
-
-    graphics->begin_gui();
-
-    ImGui::Begin("Lighting");
-
-    ImGui::Text("Directional light");
-
-    ImGui::DragFloat3(
-            "Direction",
-            &m_directional_direction.x,
-            0.05f,
-            -1.0f,
-            1.0f
-            );
-
-    ImGui::ColorEdit3(
-            "Directional color",
-            &m_directional_color.x
-            );
-
-    ImGui::SliderFloat(
-            "Directional intensity",
-            &m_directional_intensity,
-            0.0f,
-            3.0f
-            );
-
-    ImGui::Separator();
-
-    ImGui::Text("Point light");
-
-    ImGui::DragFloat3(
-            "Position",
-            &m_point_light_position.x,
-            0.05f
-            );
-
-    ImGui::ColorEdit3(
-            "Point color",
-            &m_point_light_color.x
-            );
-
-    ImGui::SliderFloat(
-            "Point intensity",
-            &m_point_light_intensity,
-            0.0f,
-            5.0f
-            );
-
-    ImGui::Separator();
-
-    ImGui::Text("Ambient");
-
-    ImGui::SliderFloat(
-            "Ambient intensity",
-            &m_ambient_intensity,
-            0.0f,
-            1.0f);
-
-    ImGui::End();
-
-    graphics->end_gui();
-}
+#include "LightingController.hpp"
+#include "GUIController.hpp"
 
 class SceneController : public engine::core::Controller {
 
@@ -172,20 +91,20 @@ void SceneController::update() {
 
         // dogadjaj 1 - zalazak sunca
         if (m_event_state == EventState::WaitingForSunset && m_event_timer >= 3.0f) {
-            lighting->m_directional_intensity = 0.5f;
-            lighting->m_directional_color = glm::vec3(1.0f, 0.45f, 0.15f);
+            lighting->lights.directional.intensity = 0.5f;
+            lighting->lights.directional.color = glm::vec3(1.0f, 0.45f, 0.15f);
 
-            lighting->m_skybox_tint = glm::vec3(1.0f, 0.55f, 0.35f);
+            lighting->lights.skybox_tint = glm::vec3(1.0f, 0.55f, 0.35f);
 
             m_event_state = EventState::WaitingForNight;
             m_event_timer = 0.0f;
         }
         // dogadjaj 2 - noc
         else if (m_event_state == EventState::WaitingForNight && m_event_timer >= 5.0f) {
-            lighting->m_point_light_intensity = 4.0f;
-            lighting->m_point_light_color = glm::vec3(1.0f, 0.2f, 0.05f);
+            lighting->lights.point.intensity = 4.0f;
+            lighting->lights.point.color = glm::vec3(1.0f, 0.2f, 0.05f);
 
-            lighting->m_skybox_tint = glm::vec3(0.18f, 0.22f, 0.4f);
+            lighting->lights.skybox_tint = glm::vec3(0.18f, 0.22f, 0.4f);
 
             m_event_state = EventState::Idle;
             m_event_timer = 0.0f;
@@ -224,15 +143,15 @@ void SceneController::draw() {
         shader->set_mat4("projection", projection);
 
         shader->set_vec3("objectColor", object_color);
-        shader->set_vec3("lightDirection", lighting->m_directional_direction);
-        shader->set_vec3("lightColor", lighting->m_directional_color);
-        shader->set_float("directionalIntensity", lighting->m_directional_intensity);
+        shader->set_vec3("lightDirection", lighting->lights.directional.direction);
+        shader->set_vec3("lightColor", lighting->lights.directional.color);
+        shader->set_float("directionalIntensity", lighting->lights.directional.intensity);
 
-        shader->set_vec3("pointLightPosition", lighting->m_point_light_position);
-        shader->set_vec3("pointLightColor", lighting->m_point_light_color);
-        shader->set_float("pointLightIntensity", lighting->m_point_light_intensity);
+        shader->set_vec3("pointLightPosition", lighting->lights.point.position);
+        shader->set_vec3("pointLightColor", lighting->lights.point.color);
+        shader->set_float("pointLightIntensity", lighting->lights.point.intensity);
 
-        shader->set_float("ambientIntensity", lighting->m_ambient_intensity);
+        shader->set_float("ambientIntensity", lighting->lights.ambient_intensity);
 
         shader->set_vec3("viewPos", camera->Position);
 
@@ -323,7 +242,7 @@ void SceneController::draw() {
             );
 
     skybox_shader->use();
-    skybox_shader->set_vec3("skyboxTint", lighting->m_skybox_tint);
+    skybox_shader->set_vec3("skyboxTint", lighting->lights.skybox_tint);
 
     graphics->draw_skybox(skybox_shader, skybox);
 }
@@ -344,6 +263,9 @@ void MyApp::app_setup() {
 
     auto lighting_controller = register_controller<LightingController>();
     lighting_controller->after(scene_controller);
+
+    auto gui_controller = register_controller<GUIController>();
+    gui_controller->after(lighting_controller);
 }
 
 int main(int argc, char **argv) { return std::make_unique<MyApp>()->run(argc, argv); }
